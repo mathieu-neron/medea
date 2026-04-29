@@ -33,10 +33,3 @@ Output: clips at `data/raw/<id>.mp4`, metadata in `data/medea.db`. Re-runs are i
 ## Status
 
 This project is being built milestone-by-milestone. See [PROGRESS.md](PROGRESS.md) for the current state and [PLAN.md](PLAN.md) for the full architecture and remaining milestones.
-
-## Resume in a new session
-
-```
-cd C:\Users\mathi\work\medea
-claude "Continue Medea from the next unfinished milestone in PROGRESS.md."
-```

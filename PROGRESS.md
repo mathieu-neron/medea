@@ -4,7 +4,7 @@ One line per milestone. Update when finishing a milestone.
 
 - M1 — Bootstrap: ✅ done (2026-04-28) — project layout, deps installed via `uv sync` (507 pkgs), GPU verified
 - M2 — Ingest: ✅ done (2026-04-28) — 94 clips (44 offender / 50 control) at 30s middle slices, ≤720p, in `data/raw/`. SQLite at `data/medea.db` (channels + videos)
-- M3 — Visual + audio features: ⏳ pending
+- M3 — Visual + audio features: ✅ done (2026-04-29) — `data/features/visual.parquet` (94×512 CLIP ViT-B/32 mean-pooled, L2-normed) and `data/features/audio.parquet` (faster-whisper transcript + lang + wav2vec2 ai_voice_prob). Strong class signal already: offender ai_voice median 0.86 vs control 0.37; offender mean transcript 123 chars vs control 303.
 - M4 — Text + metadata features: ⏳ pending
 - M5 — Vector DB + UMAP: ⏳ pending
 - M6 — LogReg baseline: ⏳ pending
@@ -15,9 +15,9 @@ One line per milestone. Update when finishing a milestone.
 
 ## Next action when resuming
 
-Start M3 — Visual + audio features. See "M3" in PLAN.md. Build it together — discuss design choices, write code, test on a small batch — don't pre-write later milestones.
+Start M4 — Text + metadata features. See "M4" in PLAN.md. Build it together — discuss design choices, write code, test on a small batch — don't pre-write later milestones.
 
-The 94 clips in `data/raw/` are the input. Output: per-modality feature vectors cached to parquet (visual via open_clip ViT-B/32, audio via faster-whisper transcript + wav2vec2 anti-spoof).
+Inputs: `data/features/audio.parquet` (transcripts) + the videos table in `data/medea.db` (titles, descriptions, upload dates, view counts). Output: `data/features/text.parquet` (sentence-transformer embeddings of transcript and title+desc), `data/features/metadata.parquet` (channel age, mean inter-upload days, title length, %uppercase, clickbait regex hits, etc.), and a `features/pipeline.py` that concatenates + L2-normalizes per-modality into one feature vector per video.
 
 ## Notes
 
