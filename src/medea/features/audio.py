@@ -10,6 +10,18 @@ Three stages, each independently swappable:
 Anti-spoof models are typically trained on short (~4s) windows. We chunk the
 clip at 4s, score each chunk, and average — more robust than a single 30s pass
 that the model would just truncate.
+
+Models:
+    faster-whisper "small" (CTranslate2 reimplementation of OpenAI Whisper).
+        - lib:     https://github.com/SYSTRAN/faster-whisper
+        - weights: https://huggingface.co/Systran/faster-whisper-small
+          (auto-resolved from the "small" alias; ~244M params, multilingual.)
+
+    Deepfake-audio-detection (wav2vec2 fine-tuned for real-vs-fake speech).
+        - card:   https://huggingface.co/motheecreator/Deepfake-audio-detection
+        - base:   facebook/wav2vec2-base
+          PLAN.md flags AI-voice detector quality as varying by training set —
+          spot-check before relying on this score (M9 error analysis).
 """
 
 from __future__ import annotations

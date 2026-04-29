@@ -6,6 +6,13 @@ L2-normalize each → mean-pool → re-normalize → 512-dim float32 vector.
 Why mean-pool + re-normalize: averaging unit vectors gives a non-unit result
 whose magnitude correlates with frame agreement; we drop that magnitude so
 downstream cosine similarity is purely directional.
+
+Model:
+    ViT-B/32 from open_clip, weights ``laion2b_s34b_b79k``.
+    - open_clip:  https://github.com/mlfoundations/open_clip
+    - weights:    https://huggingface.co/laion/CLIP-ViT-B-32-laion2B-s34B-b79K
+      (LAION-2B English subset, 34B samples seen, 79K batch size; 512-dim
+      image/text embeddings.)
 """
 
 from __future__ import annotations
