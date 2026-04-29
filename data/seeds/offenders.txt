@@ -1,0 +1,7 @@
+# Known AI-generated / AI-narrated YouTube channels.
+# One channel URL per line. See README.md for format.
+# Add 5-10 channels covering different AI-slop patterns.
+#
+# Examples (replace with your own picks):
+# https://www.youtube.com/@example-ai-history-slop
+# https://www.youtube.com/@example-ai-voice-stock-footage

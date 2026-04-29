@@ -1,0 +1,5 @@
+# Human-made control channels. Match the topical domain of your offenders.
+# One channel URL per line. See README.md for format.
+#
+# Examples:
+# https://www.youtube.com/@example-real-history-creator
