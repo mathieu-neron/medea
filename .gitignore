@@ -21,8 +21,9 @@ htmlcov/
 data/raw/
 data/features/
 data/chroma/
-data/medea.sqlite
-data/medea.sqlite-*
+data/medea.db
+data/medea.db-*
+data/.bin/
 mlruns/
 models/
 *.pt
