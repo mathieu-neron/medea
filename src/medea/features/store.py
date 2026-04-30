@@ -14,6 +14,9 @@ from medea.config import FEATURES_DIR
 
 VISUAL_PARQUET = FEATURES_DIR / "visual.parquet"
 AUDIO_PARQUET = FEATURES_DIR / "audio.parquet"
+TEXT_PARQUET = FEATURES_DIR / "text.parquet"
+METADATA_PARQUET = FEATURES_DIR / "metadata.parquet"
+COMBINED_PARQUET = FEATURES_DIR / "combined.parquet"
 
 
 def load_table(path: Path) -> pd.DataFrame:
