@@ -39,6 +39,12 @@ dependencies = [
     # Utility
     "rich>=13.9",
     "tqdm>=4.66",
+    # Local-LLM RAG rationale (no API keys; talks to localhost:11434).
+    # Install Ollama from https://ollama.com/download and pull the default
+    # model via `ollama pull qwen2.5:7b-instruct-q4_K_M` to enable the LLM
+    # render path. Falls back to a deterministic rule-based rationale when
+    # the daemon isn't running.
+    "ollama>=0.4",
     # Notebook / viz (used by exploration notebook in M5)
     "jupyter>=1.1",
     "umap-learn>=0.5",
