@@ -67,11 +67,41 @@ _NEUTRALIZED_CHANNEL_COLS: tuple[str, ...] = (
 class Prediction:
     video_id: str
     title: str | None
-    score: float                                 # P(AI) ∈ [0, 1]
+    score: float                                 # P(AI) ∈ [0, 1] — final, after prior
     model: str                                   # "mlp" or "logreg"
     top_neighbors: list[Neighbor]
     modality_attribution: dict[str, float]       # share of |signed contribution|
     top_features: list[tuple[str, float]] = field(default_factory=list)
+    raw_score: float = 0.0                       # model output before temporal prior
+    upload_date: str | None = None               # YYYYMMDD as returned by yt-dlp
+    prior_cap: float | None = None               # cap applied; None if not applied
+
+
+# AI-content era boundaries — see module docstring. Pure inference-side prior:
+# our training set is 2024–2026 only, so the model has never seen an old video
+# and can't learn this signal on its own. Applied as a *cap* (min(score, cap))
+# so the prior never raises a confidence, only bounds it from above.
+_TEMPORAL_CAPS: tuple[tuple[int, float], ...] = (
+    (2017, 0.05),  # before generative video existed in any usable form
+    (2020, 0.30),  # AI narration over stock footage existed; AI visual ~0
+    (2022, 0.65),  # AI narration mature; pre-DALL-E-2/Stable-Diffusion era
+    # 2022+ : no cap (1.0)
+)
+
+
+def _temporal_prior_cap(upload_date_yyyymmdd: str | None) -> float | None:
+    """Maximum plausible P(AI) given the upload year. Returns None if upload date
+    is missing or post the latest cap year (i.e. no cap applies)."""
+    if not upload_date_yyyymmdd or len(upload_date_yyyymmdd) < 4:
+        return None
+    try:
+        year = int(upload_date_yyyymmdd[:4])
+    except ValueError:
+        return None
+    for cutoff_year, cap in _TEMPORAL_CAPS:
+        if year < cutoff_year:
+            return cap
+    return None
 
 
 _VIDEO_ID_RE = re.compile(r"^[A-Za-z0-9_-]{11}$")
@@ -181,7 +211,9 @@ class Predictor:
             raise ValueError("VideoMeta.clip_path is required")
         fused = self._build_fused_vector(meta)
 
-        score = self._score(fused)
+        raw_score = self._score(fused)
+        cap = _temporal_prior_cap(meta.upload_date)
+        score = min(raw_score, cap) if cap is not None else raw_score
         knn = knn_query(self.collection, fused, k=k)
         modality_attr, top_feats = self._attribute(fused)
 
@@ -193,6 +225,9 @@ class Predictor:
             top_neighbors=knn.neighbors,
             modality_attribution=modality_attr,
             top_features=top_feats,
+            raw_score=raw_score,
+            upload_date=meta.upload_date,
+            prior_cap=cap,
         )
 
     def _build_fused_vector(self, meta: VideoMeta) -> np.ndarray:

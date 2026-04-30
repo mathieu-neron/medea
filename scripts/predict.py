@@ -50,8 +50,18 @@ def _print_result(pred, model: str) -> None:
     console.rule(f"[bold]{pred.video_id}[/bold]")
     if pred.title:
         console.print(f"[bold]title:[/bold] {pred.title}")
+    if pred.upload_date:
+        ud = pred.upload_date
+        pretty = f"{ud[:4]}-{ud[4:6]}-{ud[6:]}" if len(ud) == 8 else ud
+        console.print(f"[bold]upload:[/bold] {pretty}")
     console.print(f"[bold]model:[/bold] {model}")
     console.print(f"[bold]P(AI):[/bold] {_score_bar(pred.score)}")
+    if pred.prior_cap is not None:
+        console.print(
+            f"[yellow]temporal prior applied[/yellow]: raw model score "
+            f"{pred.raw_score:.3f} capped at {pred.prior_cap:.2f} "
+            f"(upload year {pred.upload_date[:4] if pred.upload_date else '?'})"
+        )
 
     nbr_table = Table(title="Top-k known neighbors", show_lines=False)
     nbr_table.add_column("video_id")
@@ -115,7 +125,10 @@ def main(
         payload = {
             "video_id": pred.video_id,
             "title": pred.title,
+            "upload_date": pred.upload_date,
             "score": pred.score,
+            "raw_score": pred.raw_score,
+            "prior_cap": pred.prior_cap,
             "model": pred.model,
             "top_neighbors": [asdict(n) for n in pred.top_neighbors],
             "modality_attribution": pred.modality_attribution,

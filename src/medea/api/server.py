@@ -43,7 +43,10 @@ class NeighborOut(BaseModel):
 class PredictResponse(BaseModel):
     video_id: str
     title: str | None
+    upload_date: str | None
     score: float
+    raw_score: float
+    prior_cap: float | None
     model: str
     top_neighbors: list[NeighborOut]
     modality_attribution: dict[str, float]
@@ -92,7 +95,10 @@ def predict(req: PredictRequest) -> PredictResponse:
     return PredictResponse(
         video_id=pred.video_id,
         title=pred.title,
+        upload_date=pred.upload_date,
         score=pred.score,
+        raw_score=pred.raw_score,
+        prior_cap=pred.prior_cap,
         model=pred.model,
         top_neighbors=[NeighborOut(**asdict(n)) for n in pred.top_neighbors],
         modality_attribution=pred.modality_attribution,
