@@ -32,8 +32,13 @@ from medea.features.store import (
 from medea.storage.db import connect
 
 # Order is meaningful: must match downstream classifier expectations.
+# ``has_speech`` and ``transcript_chars`` were added in M9 to gate ai_voice_prob
+# against silent clips: the wav2vec2 anti-spoof score is meaningless when no
+# voice is present, but reads ~0.8 (indistinguishable from AI narration).
 SCALAR_COLUMNS: tuple[str, ...] = (
     "ai_voice_prob",
+    "has_speech",
+    "transcript_chars",
     "title_len",
     "title_word_count",
     "title_caps_ratio",
@@ -96,10 +101,18 @@ def build_dataset() -> FusedDataset:
     df = (
         labels_df
         .merge(visual.rename(columns={"embedding": "visual_emb"}), on="video_id")
-        .merge(audio[["video_id", "ai_voice_prob"]], on="video_id")
+        .merge(audio[["video_id", "ai_voice_prob", "transcript"]], on="video_id")
         .merge(text, on="video_id")
         .merge(meta, on="video_id")
     )
+
+    # Speech-presence scalars (M9 addition). ``ai_voice_prob`` is meaningless
+    # without speech and reads ~0.8 on silent clips — having ``has_speech`` as
+    # a separate feature lets the classifier downweight ai_voice_prob in that
+    # regime instead of treating silence as evidence of AI narration.
+    transcripts = df["transcript"].fillna("").astype(str)
+    df["has_speech"] = (transcripts.str.strip().str.len() > 0).astype(np.float32)
+    df["transcript_chars"] = transcripts.str.len().astype(np.float32)
 
     visual_block = _l2(_stack(df["visual_emb"]))
     transcript_block = _l2(_stack(df["transcript_emb"]))

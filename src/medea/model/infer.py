@@ -205,7 +205,12 @@ class Predictor:
             description=meta.description or "",
         )
 
-        scalars_dict: dict[str, float] = {"ai_voice_prob": float(audio_feats.ai_voice_prob)}
+        transcript_text = audio_feats.transcript or ""
+        scalars_dict: dict[str, float] = {
+            "ai_voice_prob": float(audio_feats.ai_voice_prob),
+            "has_speech": float(len(transcript_text.strip()) > 0),
+            "transcript_chars": float(len(transcript_text)),
+        }
         scalars_dict.update(
             video_features(
                 title=meta.title or "",
