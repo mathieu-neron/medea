@@ -95,6 +95,10 @@ def main(
     model: str = typer.Option("mlp", help="mlp | logreg"),
     k: int = typer.Option(5, help="Number of neighbors to return."),
     as_json: bool = typer.Option(False, "--json", help="Print JSON instead of tables."),
+    explain: bool = typer.Option(
+        False, "--explain",
+        help="Print a deterministic, neighbor-grounded rationale.",
+    ),
     log_level: str = typer.Option("WARNING"),
 ) -> None:
     logging.basicConfig(
@@ -121,6 +125,12 @@ def main(
         progress.add_task("downloading + scoring", total=None)
         pred = predictor.predict_url(url, k=k)
 
+    rationale: str | None = None
+    if explain:
+        from medea.model.explain import explain as explain_fn
+
+        rationale = explain_fn(pred)
+
     if as_json:
         payload = {
             "video_id": pred.video_id,
@@ -133,11 +143,15 @@ def main(
             "top_neighbors": [asdict(n) for n in pred.top_neighbors],
             "modality_attribution": pred.modality_attribution,
             "top_features": pred.top_features,
+            "rationale": rationale,
         }
         console.print_json(data=payload)
         return
 
     _print_result(pred, model=model)
+    if rationale:
+        console.rule("[bold]Rationale[/bold]")
+        console.print(rationale)
 
 
 if __name__ == "__main__":

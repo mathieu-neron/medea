@@ -31,6 +31,7 @@ class PredictRequest(BaseModel):
     url: str = Field(..., description="YouTube URL or 11-char video id.")
     k: int = Field(5, ge=1, le=50, description="Number of neighbors to return.")
     model: Literal["mlp", "logreg"] = Field("mlp")
+    explain: bool = Field(False, description="Generate a short rationale via Claude API.")
 
 
 class NeighborOut(BaseModel):
@@ -51,6 +52,7 @@ class PredictResponse(BaseModel):
     top_neighbors: list[NeighborOut]
     modality_attribution: dict[str, float]
     top_features: list[tuple[str, float]]
+    rationale: str | None = None
 
 
 _predictors: dict[str, Predictor] = {}
@@ -92,6 +94,12 @@ def predict(req: PredictRequest) -> PredictResponse:
     except RuntimeError as e:  # download failure / too short etc.
         raise HTTPException(422, str(e)) from e
 
+    rationale: str | None = None
+    if req.explain:
+        from medea.model.explain import explain as explain_fn
+
+        rationale = explain_fn(pred)
+
     return PredictResponse(
         video_id=pred.video_id,
         title=pred.title,
@@ -103,4 +111,5 @@ def predict(req: PredictRequest) -> PredictResponse:
         top_neighbors=[NeighborOut(**asdict(n)) for n in pred.top_neighbors],
         modality_attribution=pred.modality_attribution,
         top_features=pred.top_features,
+        rationale=rationale,
     )
