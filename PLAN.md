@@ -52,7 +52,7 @@ The **vector DB (Chroma)** stores the labeled feature vectors and powers two thi
 
 ## Project layout
 
-Create at `C:\Users\mathi\work\medea\`:
+Create at the project root (referred to below as `medea/`):
 
 ```
 medea/
@@ -147,7 +147,7 @@ Each milestone is a stopping point where you have something runnable and learn s
 
 ## Critical files & reused utilities
 
-This is a greenfield project — nothing in `C:\Users\mathi\work\` to reuse (sibling folders `CV`, `leetcode-practice`, `TravelSitter` are unrelated). Key external tools:
+This is a greenfield project. Key external tools:
 - `yt-dlp` Python API: `yt_dlp.YoutubeDL({...}).extract_info(url, download=True)`
 - `open_clip`: `open_clip.create_model_and_transforms('ViT-B-32', pretrained='laion2b_s34b_b79k')`
 - `faster_whisper.WhisperModel('small', device='cuda', compute_type='float16')`
@@ -175,14 +175,14 @@ After each milestone:
 
 Each milestone produces durable on-disk artifacts so you can pause indefinitely and resume from any milestone in a fresh Claude Code session. To make handoff frictionless:
 
-1. **Copy this plan into the project** as `medea/PLAN.md` once the folder exists, so it's discoverable from inside the project (the `~/.claude/plans/...` filename is auto-generated and not memorable).
+1. **Copy this plan into the project** as `medea/PLAN.md` once the folder exists, so it's discoverable from inside the project.
 2. **Maintain `medea/PROGRESS.md`** — a one-line-per-milestone status file (e.g. `M2 ✅ 2026-04-30 — 100 clips ingested`). Update it as you finish each milestone. Future-you (or future-Claude) reads it first to know where to pick up.
 3. **Save a memory entry** so any future Claude session in any working directory knows the project exists, where the plan lives, and how to resume.
 4. **All caches are idempotent**: feature extraction skips videos already in parquet; ingestion skips video ids already in SQLite. Re-running scripts is safe and cheap.
 
 **To resume in a new session:**
 ```
-cd C:\Users\mathi\work\medea
+cd <path-to-medea-clone>
 claude "Continue Medea from the next unfinished milestone in PROGRESS.md."
 ```
 

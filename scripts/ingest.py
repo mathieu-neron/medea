@@ -21,7 +21,7 @@ for _stream in (sys.stdout, sys.stderr):
     if hasattr(_stream, "reconfigure"):
         _stream.reconfigure(encoding="utf-8", errors="replace")
 
-from medea.config import RAW_DIR, ensure_dirs
+from medea.config import RAW_DIR, ensure_dirs, to_repo_relative
 from medea.ingest.youtube import download_middle_clip, list_channel_videos
 from medea.storage.db import (
     connect,
@@ -120,7 +120,7 @@ def main(
                     upload_date=meta.upload_date,
                     duration=meta.duration,
                     view_count=meta.view_count,
-                    clip_path=str(meta.clip_path),
+                    clip_path=to_repo_relative(meta.clip_path),
                 )
             new_clips += 1
 

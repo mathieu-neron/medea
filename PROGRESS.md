@@ -35,7 +35,7 @@ Useful entry points (unchanged):
 
 ## Notes
 
-- Plan file: [PLAN.md](PLAN.md) (also at `~/.claude/plans/i-have-an-idea-twinkly-thunder.md`).
+- Plan file: [PLAN.md](PLAN.md).
 - Project rules: no git/commits per user preference for local practice projects. **No third-party API keys / external API integrations** — confirmed at the M9 stretch when the LLM-API rationale was reverted in favor of a local rule-based version.
 - Hardware: RTX 3080 10GB, Python 3.12.10, Windows 11.
 - ffmpeg is bundled via `imageio-ffmpeg` and copied as `data/.bin/ffmpeg(.exe)` so yt-dlp finds it; it also gets prepended to `PATH` at runtime.
